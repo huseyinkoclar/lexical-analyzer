@@ -1,7 +1,7 @@
 f = open("deneme.ceng", "r")
 
 keywords = ["break","case","char","const","do","else","enum","float","for","if","int","double", "long", "struct", "return", "static", "while"]
-operators = ["++","-","*","/","+","--","==", "<", ">", "<=",">=", "="]
+operators = [";", "++","-","*","/","+","--","==", "<", ">", "<=",">=", "="]
 stack = []
 identifier = "Identifier: "
 intConst = "IntConst: "
@@ -9,6 +9,13 @@ intConst = "IntConst: "
 def printStack(stack):
     type = defination(stack)
     while len(stack) > 0:
+        if stack[-1] == '' and len(stack) == len(type):
+            stack.pop()
+            type.pop()
+            continue
+        elif stack[-1] == '':
+            stack.pop()
+            continue
         string = type.pop()
         string += stack.pop()
         print(string)
@@ -18,10 +25,8 @@ def printStack(stack):
 def defination(stack):
     type = []
     for i in stack:
-        if i == '':
-            stack.pop()
-        elif i == ";":
-            type.append("EndOfLine")
+        if i == ";":
+            type.append("EndOfLine:  ")
         elif i == "/":
             type.append("Comment ")
             stack.clear()
@@ -30,6 +35,8 @@ def defination(stack):
             type.append("Keyword: ")
         elif i in operators:
             type.append("Operator: ")
+        elif i.isnumeric():
+            type.append("IntCost:  ")
         else:
             type.append("Identifier: ")
 
@@ -60,13 +67,13 @@ for line in f.readlines():
     arr = []
     for word in words:
         arr = check(word)
-        print(arr)
+        #print(arr)
         printStack(arr)
         '''for i in check(word):
             arr.append(i)'''
     #printStack(arr)
-    printStack(arr)
-    print(arr)
+    #printStack(arr)
+    #print(arr)
 
 
     
