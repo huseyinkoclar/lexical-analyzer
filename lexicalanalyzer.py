@@ -1,7 +1,7 @@
-f = open("deneme.ceng", "r")
+f = open("deneme1.ceng", "r")
 
 keywords = ["break","case","char","const","do","else","enum","float","for","if","int","double", "long", "struct", "return", "static", "while"]
-operators = [";", "++","-","*","/","+","--","==", "<", ">", "<=",">=", "="]
+operators = ["++","-","*","/","+","--","==", "<", ">", "<=",">=", "="]
 stack = []
 identifier = "Identifier: "
 intConst = "IntConst: "
@@ -9,24 +9,24 @@ intConst = "IntConst: "
 def printStack(stack):
     type = defination(stack)
     while len(stack) > 0:
-        if stack[-1] == '' and len(stack) == len(type):
-            stack.pop()
-            type.pop()
+        
+        typePOP = type.pop()
+        stackPOP = stack.pop()
+        if typePOP == '' or stackPOP == '':
             continue
-        elif stack[-1] == '':
-            stack.pop()
-            continue
-        string = type.pop()
-        string += stack.pop()
-        print(string)
-
+        if stackPOP[-1] == ';':
+            print(typePOP, stackPOP[:-1])
+            print("End of line")
+        else:
+            print(typePOP, stackPOP) 
+            
     
 
 def defination(stack):
     type = []
     for i in stack:
-        if i == ";":
-            type.append("EndOfLine:  ")
+        if i == '':
+            type.append('')
         elif i == "/":
             type.append("Comment ")
             stack.clear()
@@ -35,8 +35,6 @@ def defination(stack):
             type.append("Keyword: ")
         elif i in operators:
             type.append("Operator: ")
-        elif i.isnumeric():
-            type.append("IntCost:  ")
         else:
             type.append("Identifier: ")
 
