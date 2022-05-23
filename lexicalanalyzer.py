@@ -1,54 +1,100 @@
-f = open("deneme1.ceng", "r")
+f = open("code_file.ceng", "r")
 
 keywords = ["break","case","char","const","do","else","enum","float","for","if","int","double", "long", "struct", "return", "static", "while"]
-operators = ["++","-","*","/","+","--","==", "<", ">", "<=",">=", "="]
+operators = ["/*", "*/", "++","-","*","/","+","--","==", "<", ">", "<=",">=", "=", "(", ")", "{", "}"]
+brackets = ["(", ")", "{", "}"]
 stack = []
 identifier = "Identifier: "
 intConst = "IntConst: "
+commentflag = False
 
-def printStack(stack):
+def printStack(stack): #prints the stack
+    global commentflag
+    f = open("code.lex", "a")
     type = defination(stack)
     while len(stack) > 0:
-        
+        global comment
         typePOP = type.pop()
         stackPOP = stack.pop()
-        if typePOP == '' or stackPOP == '':
+        if stackPOP == "/*":
+            print("Commentline started")
+            commentflag = True
             continue
+        if commentflag == True:
+            if stackPOP == "*/":
+                commentflag = False
+                print("Commentline finished")
+                continue
+            continue
+        if stackPOP == "Comment":
+            print(typePOP, stackPOP)
+            f.write(typePOP + stackPOP + "\n")
+            comment = True
+        if typePOP == '' or stackPOP == '' or stackPOP == '\n':
+            continue
+        if len(stackPOP) > 1:
+            if stackPOP[-1:] == '\n':
+                stackPOP = stackPOP[:-1]
         if stackPOP[-1] == ';':
-            print(typePOP, stackPOP[:-1])
-            print("End of line")
-        else:
-            print(typePOP, stackPOP) 
+            if typePOP == " ":
+                stackPOP = stackPOP[:-1] + "End Of line" 
+            else:   
+                stackPOP = stackPOP[:-1]
+                stack.append("end of line")
+                type.append(" ")
+                
+        if comment is not True:
+            f.write(typePOP + stackPOP + "\n")
+            print(typePOP, stackPOP)
             
     
 
-def defination(stack):
+def defination(stack): #returns the type of the word
     type = []
     for i in stack:
         if i == '':
             type.append('')
-        elif i == "/":
-            type.append("Comment ")
-            stack.clear()
-            stack.append(" ")
+        elif i == "Comment":
+            type.append(" ")
+        elif i == ';' or i == ";\n":
+            type.append(" ")
         elif i in keywords:
             type.append("Keyword: ")
         elif i in operators:
-            type.append("Operator: ")
+            if i in brackets:
+                if i == "(":
+                    type.append("leftPar: ")
+                elif i == ")":
+                    type.append("rightPar: ")
+                elif i == "{":
+                    type.append("leftCurlyBracket: ")
+                elif i == "}":
+                    type.append("rightCurlyBracket: ")
+            else:
+                type.append("Operator: ")
         else:
-            type.append("Identifier: ")
+            if i.isdigit():
+                type.append("IntConst: ")
+                if len(str(i)) > 10:
+                    type.append("ERROR: IntConst is too long")
+            else:
+                type.append("Identifier: ")
+                if len(i) > 25:
+                    print("ERROR:  Identifier is too long")
 
     return type
 
 
-def check(word):
+def check(word): #checks if the word is a keyword or an operator
     stack = []
+    if word == '//':
+        stack.append("Comment")
+        return stack
     for operator in operators:
         if operator in word:
             words = word.split(operator)
             stack.append(words[1])
             stack.append(operator)
-            #print("words[0]" , words[0])
             array = check(words[0])
             for i in array:
                 stack.append(i)
@@ -60,21 +106,12 @@ def check(word):
 
 
 for line in f.readlines():
-    words = line.split(" ")
-    #print(words)
+    comment = False
+    words = line.split(" ") # words dosyadaki her satırının kelime ve operatorlerini ayırıyoruz
     arr = []
     for word in words:
-        arr = check(word)
-        #print(arr)
-        printStack(arr)
-        '''for i in check(word):
-            arr.append(i)'''
-    #printStack(arr)
-    #printStack(arr)
-    #print(arr)
+        arr = check(word) # her kelimeyi kontrol ediyoruz
+        printStack(arr) # stack'i print ediyoruz
 
-
-    
-#print("words:  " , words)
 
 
